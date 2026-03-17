@@ -101,6 +101,11 @@ class DateCounterCardEditor extends HTMLElement {
   }
 
   setConfig(config) {
+    const titleInput = this.querySelector("#title");
+    const titleHadFocus = titleInput && document.activeElement === titleInput;
+    const selectionStart = titleHadFocus ? titleInput.selectionStart : null;
+    const selectionEnd = titleHadFocus ? titleInput.selectionEnd : null;
+
     const safeConfig = config || {};
     const nextConfig = {
       type: safeConfig.type || DateCounterCard.getCardType(),
@@ -112,6 +117,16 @@ class DateCounterCardEditor extends HTMLElement {
     this.config = nextConfig;
     if (shouldRender) {
       this.render();
+
+      if (titleHadFocus) {
+        const refreshedTitleInput = this.querySelector("#title");
+        if (refreshedTitleInput) {
+          refreshedTitleInput.focus();
+          if (typeof selectionStart === "number" && typeof selectionEnd === "number") {
+            refreshedTitleInput.setSelectionRange(selectionStart, selectionEnd);
+          }
+        }
+      }
     }
   }
 
