@@ -1,4 +1,8 @@
 class DateCounterCard extends HTMLElement {
+  static getCardType() {
+    return "custom:date-counter-card";
+  }
+
   static getLocalNowValue() {
     const now = new Date();
     return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
@@ -12,6 +16,7 @@ class DateCounterCard extends HTMLElement {
 
   static getStubConfig() {
     return {
+      type: DateCounterCard.getCardType(),
       title: "Date Counter",
       date: DateCounterCard.getLocalNowValue(),
     };
@@ -89,6 +94,7 @@ class DateCounterCardEditor extends HTMLElement {
     const safeConfig = config || {};
 
     this.config = {
+      type: safeConfig.type || DateCounterCard.getCardType(),
       title: typeof safeConfig.title === "string" ? safeConfig.title : "Zeit seit Datum",
       date: typeof safeConfig.date === "string" ? safeConfig.date : DateCounterCard.getLocalNowValue(),
     };
@@ -125,6 +131,7 @@ class DateCounterCardEditor extends HTMLElement {
     if (!this.config) return;
 
     const config = { ...this.config, ...changed };
+    config.type = config.type || DateCounterCard.getCardType();
     config.title = typeof config.title === "string" ? config.title : "";
     config.date = typeof config.date === "string" ? config.date : "";
     this.config = config;
