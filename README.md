@@ -20,6 +20,14 @@ Eine einfache Home Assistant Custom Card, die live anzeigt, wie viel Zeit seit e
 
 ### Option 1: Über HACS (empfohlen)
 
+Date Counter Card ist in HACS (Home Assistant Community Store) verfügbar.
+
+Nutze diesen Link, um das Repository direkt in HACS zu öffnen:
+
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PaulTubeTV&repository=date-counter)
+
+oder
+
 1. Öffne HACS in Home Assistant.
 2. Gehe zu **Frontend**.
 3. Füge dieses Repository als **Custom Repository** hinzu.
@@ -39,12 +47,6 @@ type: module
 ```
 
 3. Home Assistant neu starten (oder Frontend hart neu laden).
-
-## Direkt in HACS öffnen (My Home Assistant)
-
-Mit diesem Button kannst du das Repository direkt in HACS öffnen:
-
-[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PaulTubeTV&repository=date-counter)
 
 ## Verwendung
 
