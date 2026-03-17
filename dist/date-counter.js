@@ -76,3 +76,11 @@ class DateCounterCard extends HTMLElement {
 }
 
 customElements.define("date-counter-card", DateCounterCard);
+
+window.customCards = window.customCards || [];
+window.customCards.push({
+  type: "date-counter-card",
+  name: "Date Counter",
+  description: "Zeigt die vergangene Zeit seit einem Datum",
+  preview: true,
+});
