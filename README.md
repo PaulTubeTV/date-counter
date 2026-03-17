@@ -1,5 +1,10 @@
 # Date Counter Card
 
+[![hacs][hacs-badge]][hacs-url]
+[![release][release-badge]][release-url]
+![downloads][downloads-badge]
+[![translations][translations-badge]][translations-url]
+
 Eine einfache Home Assistant Custom Card, die live anzeigt, wie viel Zeit seit einem festgelegten Datum und Uhrzeit vergangen ist.
 
 ## Funktionen
@@ -81,3 +86,15 @@ date: "2025-01-01T08:00"
   - Stelle sicher, dass das Format `YYYY-MM-DDTHH:mm` verwendet wird.
 - Nach Installation keine Änderung sichtbar:
   - Browser-Cache leeren und Seite hart neu laden.
+
+
+[hacs-url]: https://github.com/hacs/integration
+[hacs-badge]: https://img.shields.io/badge/HACS-Default-41BDF5?style=flat-square
+
+[release-url]: https://github.com/PaulTubeTV/date-counter/releases
+[release-badge]: https://img.shields.io/github/v/release/PaulTubeTV/date-counter?style=flat-square
+
+[downloads-badge]: https://img.shields.io/github/downloads/PaulTubeTV/date-counter/total?style=flat-square
+
+[translations-url]: https://github.com/PaulTubeTV/date-counter/issues
+[translations-badge]: https://img.shields.io/badge/i18n-planned-2ea44f?style=flat-square

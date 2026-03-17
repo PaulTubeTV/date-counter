@@ -1,6 +1,6 @@
 {
   "name": "Date Counter Card",
-  "content_in_root": false,
+  "filename": "date-counter.js",
   "render_readme": true,
   "domain": "date_counter_card"
 }
