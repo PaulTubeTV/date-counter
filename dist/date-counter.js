@@ -1,13 +1,44 @@
 class DateCounterCard extends HTMLElement {
+  static getConfigElement() {
+    return document.createElement("date-counter-card-editor");
+  }
+
+  static getStubConfig() {
+    const now = new Date();
+    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+
+    return {
+      title: "Date Counter",
+      date: local,
+    };
+  }
+
   setConfig(config) {
+    if (!config || !config.date) {
+      throw new Error("Bitte ein Datum konfigurieren.");
+    }
+
     this.config = {
       title: config.title || "Zeit seit Datum",
-      date: config.date || null,
+      date: config.date,
     };
+
+    this.selectedDate = new Date(this.config.date);
+    if (Number.isNaN(this.selectedDate.getTime())) {
+      throw new Error("Ungültiges Datum in der Karten-Konfiguration.");
+    }
+
+    if (this.isConnected) {
+      this.render();
+      this.updateTime();
+    }
   }
 
   connectedCallback() {
     this.render();
+    this.updateTime();
     this.interval = setInterval(() => this.updateTime(), 1000);
   }
 
@@ -16,7 +47,7 @@ class DateCounterCard extends HTMLElement {
   }
 
   updateTime() {
-    if (!this.selectedDate) return;
+    if (!this.selectedDate || !this.timeContainer) return;
 
     const now = new Date();
     const diffMs = now - this.selectedDate;
@@ -35,47 +66,72 @@ class DateCounterCard extends HTMLElement {
   }
 
   render() {
+    if (!this.config) return;
+
     this.innerHTML = `
       <ha-card>
         <div style="padding:16px">
           <h3>${this.config.title}</h3>
-          
-          <input type="datetime-local" id="dateInput" style="width:100%; margin-bottom:10px;" />
-          
           <div id="time"></div>
         </div>
       </ha-card>
     `;
 
-    this.dateInput = this.querySelector("#dateInput");
     this.timeContainer = this.querySelector("#time");
+  }
+}
 
-    // gespeichertes Datum laden
-    const saved = localStorage.getItem(this.getStorageKey());
-    if (saved) {
-      this.dateInput.value = saved;
-      this.selectedDate = new Date(saved);
-    } else if (this.config.date) {
-      this.dateInput.value = this.config.date;
-      this.selectedDate = new Date(this.config.date);
-    }
-
-    this.dateInput.addEventListener("change", (e) => {
-      const value = e.target.value;
-      this.selectedDate = new Date(value);
-      localStorage.setItem(this.getStorageKey(), value);
-      this.updateTime();
-    });
-
-    this.updateTime();
+class DateCounterCardEditor extends HTMLElement {
+  setConfig(config) {
+    this.config = {
+      title: config.title || "Zeit seit Datum",
+      date: config.date || "",
+    };
+    this.render();
   }
 
-  getStorageKey() {
-    return `date-counter-${this.config.title}`;
+  render() {
+    if (!this.config) return;
+
+    this.innerHTML = `
+      <div style="display:flex; flex-direction:column; gap:12px; padding:8px 0;">
+        <label style="display:flex; flex-direction:column; gap:4px;">
+          <span>Titel</span>
+          <input id="title" type="text" value="${this.config.title}" />
+        </label>
+
+        <label style="display:flex; flex-direction:column; gap:4px;">
+          <span>Datum</span>
+          <input id="date" type="datetime-local" value="${this.config.date}" />
+        </label>
+      </div>
+    `;
+
+    this.querySelector("#title").addEventListener("input", (e) => {
+      this.updateConfig({ title: e.target.value });
+    });
+
+    this.querySelector("#date").addEventListener("change", (e) => {
+      this.updateConfig({ date: e.target.value });
+    });
+  }
+
+  updateConfig(changed) {
+    const config = { ...this.config, ...changed };
+    this.config = config;
+
+    this.dispatchEvent(
+      new CustomEvent("config-changed", {
+        detail: { config },
+        bubbles: true,
+        composed: true,
+      })
+    );
   }
 }
 
 customElements.define("date-counter-card", DateCounterCard);
+customElements.define("date-counter-card-editor", DateCounterCardEditor);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
