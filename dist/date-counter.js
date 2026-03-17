@@ -90,15 +90,29 @@ class DateCounterCard extends HTMLElement {
 }
 
 class DateCounterCardEditor extends HTMLElement {
+  static isSameConfig(left, right) {
+    return (
+      left &&
+      right &&
+      left.type === right.type &&
+      left.title === right.title &&
+      left.date === right.date
+    );
+  }
+
   setConfig(config) {
     const safeConfig = config || {};
-
-    this.config = {
+    const nextConfig = {
       type: safeConfig.type || DateCounterCard.getCardType(),
       title: typeof safeConfig.title === "string" ? safeConfig.title : "Zeit seit Datum",
       date: typeof safeConfig.date === "string" ? safeConfig.date : DateCounterCard.getLocalNowValue(),
     };
-    this.render();
+    const shouldRender = !DateCounterCardEditor.isSameConfig(this.config, nextConfig);
+
+    this.config = nextConfig;
+    if (shouldRender) {
+      this.render();
+    }
   }
 
   static splitDateTime(value) {
