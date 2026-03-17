@@ -1,3 +1,152 @@
+const DATE_COUNTER_TRANSLATIONS = {
+  en: {
+    default_title: "Time Since Date",
+    missing_date: "Please set a date in the card configuration.",
+    units: {
+      days: "Days",
+      hours: "Hours",
+      minutes: "Minutes",
+      seconds: "Seconds",
+    },
+    editor: {
+      title: "Title",
+      title_placeholder: "e.g. Since wedding",
+      date: "Date",
+      time: "Time",
+      help: "Date and time are only set here in the configuration.",
+    },
+  },
+  de: {
+    default_title: "Zeit seit Datum",
+    missing_date: "Bitte Datum in der Kartenkonfiguration setzen.",
+    units: {
+      days: "Tage",
+      hours: "Stunden",
+      minutes: "Minuten",
+      seconds: "Sekunden",
+    },
+    editor: {
+      title: "Titel",
+      title_placeholder: "z. B. Seit Hochzeit",
+      date: "Datum",
+      time: "Uhrzeit",
+      help: "Datum und Uhrzeit werden nur hier in der Konfiguration gesetzt.",
+    },
+  },
+  fr: {
+    default_title: "Temps depuis la date",
+    missing_date: "Veuillez definir une date dans la configuration de la carte.",
+    units: {
+      days: "Jours",
+      hours: "Heures",
+      minutes: "Minutes",
+      seconds: "Secondes",
+    },
+    editor: {
+      title: "Titre",
+      title_placeholder: "ex. Depuis le mariage",
+      date: "Date",
+      time: "Heure",
+      help: "La date et l'heure sont definies uniquement ici dans la configuration.",
+    },
+  },
+  es: {
+    default_title: "Tiempo desde la fecha",
+    missing_date: "Configura una fecha en la configuracion de la tarjeta.",
+    units: {
+      days: "Dias",
+      hours: "Horas",
+      minutes: "Minutos",
+      seconds: "Segundos",
+    },
+    editor: {
+      title: "Titulo",
+      title_placeholder: "p. ej. Desde la boda",
+      date: "Fecha",
+      time: "Hora",
+      help: "La fecha y la hora solo se configuran aqui.",
+    },
+  },
+  it: {
+    default_title: "Tempo dalla data",
+    missing_date: "Imposta una data nella configurazione della scheda.",
+    units: {
+      days: "Giorni",
+      hours: "Ore",
+      minutes: "Minuti",
+      seconds: "Secondi",
+    },
+    editor: {
+      title: "Titolo",
+      title_placeholder: "es. Dal matrimonio",
+      date: "Data",
+      time: "Ora",
+      help: "Data e ora vengono impostate solo qui nella configurazione.",
+    },
+  },
+  nl: {
+    default_title: "Tijd sinds datum",
+    missing_date: "Stel een datum in de kaartconfiguratie in.",
+    units: {
+      days: "Dagen",
+      hours: "Uren",
+      minutes: "Minuten",
+      seconds: "Seconden",
+    },
+    editor: {
+      title: "Titel",
+      title_placeholder: "bijv. Sinds bruiloft",
+      date: "Datum",
+      time: "Tijd",
+      help: "Datum en tijd worden alleen hier in de configuratie ingesteld.",
+    },
+  },
+};
+
+function getLanguageCode(hass) {
+  const rawLanguage =
+    (hass && (hass.language || (hass.locale && hass.locale.language))) ||
+    (typeof navigator !== "undefined" ? navigator.language : "") ||
+    "en";
+  const normalized = String(rawLanguage).toLowerCase();
+  const baseLanguage = normalized.split("-")[0];
+
+  return DATE_COUNTER_TRANSLATIONS[baseLanguage] ? baseLanguage : "en";
+}
+
+function translate(hass, key) {
+  const language = getLanguageCode(hass);
+  const en = DATE_COUNTER_TRANSLATIONS.en || {};
+  const de = DATE_COUNTER_TRANSLATIONS.de || {};
+  const source = DATE_COUNTER_TRANSLATIONS[language] || en;
+  const parts = key.split(".");
+  const readPath = (obj) => {
+    let current = obj;
+    for (const part of parts) {
+      if (!current || typeof current !== "object" || !(part in current)) {
+        return undefined;
+      }
+      current = current[part];
+    }
+    return current;
+  };
+
+  return readPath(source) || readPath(en) || readPath(de) || key;
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/\"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function hasCustomTitle(value) {
+  return typeof value === "string" && value.trim().length > 0;
+}
+
 class DateCounterCard extends HTMLElement {
   static getCardType() {
     return "custom:date-counter-card";
@@ -17,14 +166,27 @@ class DateCounterCard extends HTMLElement {
   static getStubConfig() {
     return {
       type: DateCounterCard.getCardType(),
-      title: "Date Counter",
+      title: "",
       date: DateCounterCard.getLocalNowValue(),
     };
   }
 
+  set hass(hass) {
+    this._hass = hass;
+    if (this.config && !this.hasCustomTitle) {
+      this.config.title = translate(this._hass, "default_title");
+    }
+    if (this.isConnected) {
+      this.render();
+      this.updateTime();
+    }
+  }
+
   setConfig(config) {
+    const customTitle = hasCustomTitle(config && config.title);
+    this.hasCustomTitle = customTitle;
     this.config = {
-      title: (config && config.title) || "Zeit seit Datum",
+      title: customTitle ? config.title : translate(this._hass, "default_title"),
       date: (config && config.date) || "",
     };
 
@@ -53,7 +215,7 @@ class DateCounterCard extends HTMLElement {
     if (!this.timeContainer) return;
 
     if (!this.selectedDate) {
-      this.timeContainer.innerHTML = "<p>Bitte Datum in der Kartenkonfiguration setzen.</p>";
+      this.timeContainer.innerHTML = `<p>${escapeHtml(translate(this._hass, "missing_date"))}</p>`;
       return;
     }
 
@@ -64,12 +226,16 @@ class DateCounterCard extends HTMLElement {
     const minutes = Math.floor(seconds / 60);
     const hours = Math.floor(minutes / 60);
     const days = Math.floor(hours / 24);
+    const daysLabel = translate(this._hass, "units.days");
+    const hoursLabel = translate(this._hass, "units.hours");
+    const minutesLabel = translate(this._hass, "units.minutes");
+    const secondsLabel = translate(this._hass, "units.seconds");
 
     this.timeContainer.innerHTML = `
-      <p><b>${days}</b> Tage</p>
-      <p><b>${hours % 24}</b> Stunden</p>
-      <p><b>${minutes % 60}</b> Minuten</p>
-      <p><b>${seconds % 60}</b> Sekunden</p>
+      <p><b>${days}</b> ${escapeHtml(daysLabel)}</p>
+      <p><b>${hours % 24}</b> ${escapeHtml(hoursLabel)}</p>
+      <p><b>${minutes % 60}</b> ${escapeHtml(minutesLabel)}</p>
+      <p><b>${seconds % 60}</b> ${escapeHtml(secondsLabel)}</p>
     `;
   }
 
@@ -79,7 +245,7 @@ class DateCounterCard extends HTMLElement {
     this.innerHTML = `
       <ha-card>
         <div style="padding:16px">
-          <h3>${this.config.title}</h3>
+          <h3>${escapeHtml(this.config.title)}</h3>
           <div id="time"></div>
         </div>
       </ha-card>
@@ -107,9 +273,11 @@ class DateCounterCardEditor extends HTMLElement {
     const selectionEnd = titleHadFocus ? titleInput.selectionEnd : null;
 
     const safeConfig = config || {};
+    const customTitle = hasCustomTitle(safeConfig.title);
+    this.hasCustomTitle = customTitle;
     const nextConfig = {
       type: safeConfig.type || DateCounterCard.getCardType(),
-      title: typeof safeConfig.title === "string" ? safeConfig.title : "Zeit seit Datum",
+      title: customTitle ? safeConfig.title : translate(this._hass, "default_title"),
       date: typeof safeConfig.date === "string" ? safeConfig.date : DateCounterCard.getLocalNowValue(),
     };
     const shouldRender = !DateCounterCardEditor.isSameConfig(this.config, nextConfig);
@@ -127,6 +295,16 @@ class DateCounterCardEditor extends HTMLElement {
           }
         }
       }
+    }
+  }
+
+  set hass(hass) {
+    this._hass = hass;
+    if (this.config && !this.hasCustomTitle) {
+      this.config.title = translate(this._hass, "default_title");
+    }
+    if (this.isConnected) {
+      this.render();
     }
   }
 
@@ -165,27 +343,32 @@ class DateCounterCardEditor extends HTMLElement {
     if (!this.config) return;
 
     const { dateValue, timeValue } = DateCounterCardEditor.splitDateTime(this.config.date);
+    const titleLabel = translate(this._hass, "editor.title");
+    const titlePlaceholder = translate(this._hass, "editor.title_placeholder");
+    const dateLabel = translate(this._hass, "editor.date");
+    const timeLabel = translate(this._hass, "editor.time");
+    const helpText = translate(this._hass, "editor.help");
 
     this.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px; padding:8px 0;">
         <label style="display:flex; flex-direction:column; gap:4px;">
-          <span>Titel</span>
-          <input id="title" type="text" value="${this.config.title}" placeholder="z. B. Seit Hochzeit" />
+          <span>${escapeHtml(titleLabel)}</span>
+          <input id="title" type="text" value="${escapeHtml(this.config.title)}" placeholder="${escapeHtml(titlePlaceholder)}" />
         </label>
 
         <div style="display:grid; grid-template-columns: 1fr 140px; gap:8px;">
           <label style="display:flex; flex-direction:column; gap:4px;">
-            <span>Datum</span>
+            <span>${escapeHtml(dateLabel)}</span>
             <input id="date" type="date" value="${dateValue}" />
           </label>
 
           <label style="display:flex; flex-direction:column; gap:4px;">
-            <span>Uhrzeit</span>
+            <span>${escapeHtml(timeLabel)}</span>
             <input id="time" type="time" step="60" value="${timeValue}" />
           </label>
         </div>
 
-        <small style="opacity:0.75;">Datum und Uhrzeit werden nur hier in der Konfiguration gesetzt.</small>
+        <small style="opacity:0.75;">${escapeHtml(helpText)}</small>
       </div>
     `;
 
@@ -228,6 +411,6 @@ window.customCards = window.customCards || [];
 window.customCards.push({
   type: "date-counter-card",
   name: "Date Counter",
-  description: "Zeigt die vergangene Zeit seit einem Datum",
+  description: "Shows elapsed time since a date",
   preview: true,
 });

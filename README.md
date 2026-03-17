@@ -5,57 +5,58 @@
 ![downloads][downloads-badge]
 [![translations][translations-badge]][translations-url]
 
-Eine einfache Home Assistant Custom Card, die live anzeigt, wie viel Zeit seit einem festgelegten Datum und Uhrzeit vergangen ist.
+An easy Home Assistant custom card that shows live elapsed time since a configured date and time.
 
-## Funktionen
+## Features
 
-- Zeigt vergangene Zeit in Tagen, Stunden, Minuten und Sekunden
-- Live-Update jede Sekunde
-- Konfigurierbarer Titel
-- Datum und Uhrzeit direkt im visuellen Editor auswählbar
-- HACS-kompatibel
+- Shows elapsed time in days, hours, minutes, and seconds
+- Live update every second
+- Configurable title
+- Date and time can be selected directly in the visual editor
+- HACS compatible
+- Built-in translations: DE, EN, FR, ES, IT, NL
 
-## Voraussetzungen
+## Requirements
 
-- Home Assistant mit Lovelace Dashboard
-- Zugriff auf `www` (lokale Ressourcen)
-- Optional: HACS für einfache Installation/Updates
+- Home Assistant with Lovelace dashboard
+- Access to `www` (local resources)
+- Optional: HACS for easier installation and updates
 
 ## Installation
 
-### Option 1: Über HACS (empfohlen)
+### Option 1: Via HACS (recommended)
 
-Date Counter Card ist in HACS (Home Assistant Community Store) verfügbar.
+Date Counter Card is available in HACS (Home Assistant Community Store).
 
-Nutze diesen Link, um das Repository direkt in HACS zu öffnen:
+Use this link to open the repository directly in HACS:
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PaulTubeTV&repository=date-counter)
 
-oder
+or
 
-1. Öffne HACS in Home Assistant.
-2. Gehe zu **Frontend**.
-3. Füge dieses Repository als **Custom Repository** hinzu.
-4. Wähle Kategorie **Dashboard** (oder **Lovelace**, je nach HACS-Version).
-5. Installiere **Date Counter Card**.
-6. Starte Home Assistant neu.
+1. Open HACS in Home Assistant.
+2. Go to **Frontend**.
+3. Add this repository as a **Custom Repository**.
+4. Select category **Dashboard** (or **Lovelace**, depending on HACS version).
+5. Install **Date Counter Card**.
+6. Restart Home Assistant.
 
-### Option 2: Manuell
+### Option 2: Manual
 
-1. Kopiere die Datei `dist/date-counter.js` nach:
+1. Copy `dist/date-counter.js` to:
    - `<config>/www/date-counter.js`
-2. Füge die Ressource in Home Assistant hinzu:
+2. Add the resource in Home Assistant:
 
 ```yaml
 url: /local/date-counter.js
 type: module
 ```
 
-3. Home Assistant neu starten (oder Frontend hart neu laden).
+3. Restart Home Assistant (or hard reload the frontend).
 
-## Verwendung
+## Usage
 
-Füge eine Karte in Lovelace hinzu:
+Add a card in Lovelace:
 
 ```yaml
 type: custom:date-counter-card
@@ -63,29 +64,34 @@ title: Seit Projektstart
 date: "2025-01-01T08:00"
 ```
 
-## Konfigurationsoptionen
+## Configuration Options
 
-- `type` (Pflicht): Muss `custom:date-counter-card` sein
-- `title` (optional): Überschrift der Karte
-  - Standard: `Zeit seit Datum`
-- `date` (Pflicht für Anzeige): Startdatum mit Uhrzeit im Format `YYYY-MM-DDTHH:mm`
-  - Beispiel: `2026-03-17T14:30`
+- `type` (required): Must be `custom:date-counter-card`
+- `title` (optional): Card heading
+  - Default: localized by UI language (for example `Time Since Date` in EN, `Zeit seit Datum` in DE)
+- `date` (required for display): Start date and time in format `YYYY-MM-DDTHH:mm`
+  - Example: `2026-03-17T14:30`
 
-## Hinweise
+## Notes
 
-- Die Karte verwendet die lokale Zeit des Browsers/Home Assistant-Frontends.
-- Wenn kein gültiges Datum gesetzt ist, wird ein Hinweistext angezeigt.
-- Änderungen in der Konfiguration werden sofort übernommen.
+- The card uses the local time from the browser/Home Assistant frontend.
+- If no valid date is set, an info message is shown.
+- Configuration changes are applied immediately.
 
-## Fehlerbehebung
+## Troubleshooting
 
-- Karte wird nicht angezeigt:
-  - Prüfe, ob die Ressource korrekt eingebunden ist (`/local/date-counter.js`).
-  - Prüfe Browser-Konsole auf JavaScript-Fehler.
-- Datum wird nicht gezählt:
-  - Stelle sicher, dass das Format `YYYY-MM-DDTHH:mm` verwendet wird.
-- Nach Installation keine Änderung sichtbar:
-  - Browser-Cache leeren und Seite hart neu laden.
+- Card is not shown:
+  - Check that the resource is correctly configured (`/local/date-counter.js`).
+  - Check browser console for JavaScript errors.
+- Date is not counted:
+  - Ensure format `YYYY-MM-DDTHH:mm` is used.
+- No visible change after install:
+  - Clear browser cache and hard reload the page.
+
+## Language Files
+
+- English: this file
+- German: `README.de.md`
 
 
 [hacs-url]: https://github.com/hacs/integration
@@ -97,4 +103,4 @@ date: "2025-01-01T08:00"
 [downloads-badge]: https://img.shields.io/github/downloads/PaulTubeTV/date-counter/total?style=flat-square
 
 [translations-url]: https://github.com/PaulTubeTV/date-counter/issues
-[translations-badge]: https://img.shields.io/badge/i18n-planned-2ea44f?style=flat-square
+[translations-badge]: https://img.shields.io/badge/i18n-de%20en%20fr%20es%20it%20nl-2ea44f?style=flat-square
