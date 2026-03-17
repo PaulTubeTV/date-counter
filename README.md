@@ -5,7 +5,7 @@
 ![downloads][downloads-badge]
 [![translations][translations-badge]][translations-url]
 
-An easy Home Assistant custom card that shows live elapsed time since a configured date and time.
+An easy Home Assistant custom card that shows live elapsed time since a configured date and time. Feel free to edit yourself.
 
 ## Features
 
