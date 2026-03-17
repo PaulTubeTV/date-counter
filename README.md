@@ -40,6 +40,12 @@ type: module
 
 3. Home Assistant neu starten (oder Frontend hart neu laden).
 
+## Direkt hinzufügen (My Home Assistant)
+
+Mit diesem Button kannst du die Karte direkt im Lovelace-Dialog vorbefüllen:
+
+[![Open your Home Assistant instance and add this card](https://my.home-assistant.io/badges/lovelace-add-card.svg)](https://my.home-assistant.io/redirect/lovelace/?add-card=%7B%22type%22%3A%22custom%3Adate-counter-card%22%7D)
+
 ## Verwendung
 
 Füge eine Karte in Lovelace hinzu:
