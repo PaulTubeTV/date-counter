@@ -86,9 +86,11 @@ class DateCounterCard extends HTMLElement {
 
 class DateCounterCardEditor extends HTMLElement {
   setConfig(config) {
+    const safeConfig = config || {};
+
     this.config = {
-      title: config.title || "Zeit seit Datum",
-      date: config.date || DateCounterCard.getLocalNowValue(),
+      title: typeof safeConfig.title === "string" ? safeConfig.title : "Zeit seit Datum",
+      date: typeof safeConfig.date === "string" ? safeConfig.date : DateCounterCard.getLocalNowValue(),
     };
     this.render();
   }
