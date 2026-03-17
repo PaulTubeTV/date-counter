@@ -101,29 +101,75 @@ class DateCounterCardEditor extends HTMLElement {
     this.render();
   }
 
+  static splitDateTime(value) {
+    if (typeof value !== "string" || !value.includes("T")) {
+      return { dateValue: "", timeValue: "" };
+    }
+
+    const [dateValue, timeRaw] = value.split("T");
+    const timeValue = (timeRaw || "").slice(0, 5);
+
+    return {
+      dateValue: /^\d{4}-\d{2}-\d{2}$/.test(dateValue) ? dateValue : "",
+      timeValue: /^\d{2}:\d{2}$/.test(timeValue) ? timeValue : "",
+    };
+  }
+
+  updateDateTimeFromFields() {
+    const dateInput = this.querySelector("#date");
+    const timeInput = this.querySelector("#time");
+
+    if (!dateInput || !timeInput) return;
+
+    const dateValue = dateInput.value || "";
+    const timeValue = timeInput.value || "00:00";
+
+    if (!dateValue) {
+      this.updateConfig({ date: "" });
+      return;
+    }
+
+    this.updateConfig({ date: `${dateValue}T${timeValue}` });
+  }
+
   render() {
     if (!this.config) return;
+
+    const { dateValue, timeValue } = DateCounterCardEditor.splitDateTime(this.config.date);
 
     this.innerHTML = `
       <div style="display:flex; flex-direction:column; gap:12px; padding:8px 0;">
         <label style="display:flex; flex-direction:column; gap:4px;">
           <span>Titel</span>
-          <input id="title" type="text" value="${this.config.title}" />
+          <input id="title" type="text" value="${this.config.title}" placeholder="z. B. Seit Hochzeit" />
         </label>
 
-        <label style="display:flex; flex-direction:column; gap:4px;">
-          <span>Datum</span>
-          <input id="date" type="datetime-local" value="${this.config.date}" />
-        </label>
+        <div style="display:grid; grid-template-columns: 1fr 140px; gap:8px;">
+          <label style="display:flex; flex-direction:column; gap:4px;">
+            <span>Datum</span>
+            <input id="date" type="date" value="${dateValue}" />
+          </label>
+
+          <label style="display:flex; flex-direction:column; gap:4px;">
+            <span>Uhrzeit</span>
+            <input id="time" type="time" step="60" value="${timeValue}" />
+          </label>
+        </div>
+
+        <small style="opacity:0.75;">Datum und Uhrzeit werden nur hier in der Konfiguration gesetzt.</small>
       </div>
     `;
 
-    this.querySelector("#title").addEventListener("change", (e) => {
+    this.querySelector("#title").addEventListener("input", (e) => {
       this.updateConfig({ title: e.target.value });
     });
 
-    this.querySelector("#date").addEventListener("change", (e) => {
-      this.updateConfig({ date: e.target.value });
+    this.querySelector("#date").addEventListener("change", () => {
+      this.updateDateTimeFromFields();
+    });
+
+    this.querySelector("#time").addEventListener("change", () => {
+      this.updateDateTimeFromFields();
     });
   }
 
