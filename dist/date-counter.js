@@ -1,33 +1,31 @@
 class DateCounterCard extends HTMLElement {
+  static getLocalNowValue() {
+    const now = new Date();
+    return new Date(now.getTime() - now.getTimezoneOffset() * 60000)
+      .toISOString()
+      .slice(0, 16);
+  }
+
   static getConfigElement() {
     return document.createElement("date-counter-card-editor");
   }
 
   static getStubConfig() {
-    const now = new Date();
-    const local = new Date(now.getTime() - now.getTimezoneOffset() * 60000)
-      .toISOString()
-      .slice(0, 16);
-
     return {
       title: "Date Counter",
-      date: local,
+      date: DateCounterCard.getLocalNowValue(),
     };
   }
 
   setConfig(config) {
-    if (!config || !config.date) {
-      throw new Error("Bitte ein Datum konfigurieren.");
-    }
-
     this.config = {
-      title: config.title || "Zeit seit Datum",
-      date: config.date,
+      title: (config && config.title) || "Zeit seit Datum",
+      date: (config && config.date) || "",
     };
 
-    this.selectedDate = new Date(this.config.date);
-    if (Number.isNaN(this.selectedDate.getTime())) {
-      throw new Error("Ungültiges Datum in der Karten-Konfiguration.");
+    this.selectedDate = this.config.date ? new Date(this.config.date) : null;
+    if (this.selectedDate && Number.isNaN(this.selectedDate.getTime())) {
+      this.selectedDate = null;
     }
 
     if (this.isConnected) {
@@ -47,7 +45,12 @@ class DateCounterCard extends HTMLElement {
   }
 
   updateTime() {
-    if (!this.selectedDate || !this.timeContainer) return;
+    if (!this.timeContainer) return;
+
+    if (!this.selectedDate) {
+      this.timeContainer.innerHTML = "<p>Bitte Datum in der Kartenkonfiguration setzen.</p>";
+      return;
+    }
 
     const now = new Date();
     const diffMs = now - this.selectedDate;
@@ -85,7 +88,7 @@ class DateCounterCardEditor extends HTMLElement {
   setConfig(config) {
     this.config = {
       title: config.title || "Zeit seit Datum",
-      date: config.date || "",
+      date: config.date || DateCounterCard.getLocalNowValue(),
     };
     this.render();
   }
