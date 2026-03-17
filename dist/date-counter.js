@@ -112,7 +112,7 @@ class DateCounterCardEditor extends HTMLElement {
       </div>
     `;
 
-    this.querySelector("#title").addEventListener("input", (e) => {
+    this.querySelector("#title").addEventListener("change", (e) => {
       this.updateConfig({ title: e.target.value });
     });
 
@@ -122,7 +122,11 @@ class DateCounterCardEditor extends HTMLElement {
   }
 
   updateConfig(changed) {
+    if (!this.config) return;
+
     const config = { ...this.config, ...changed };
+    config.title = typeof config.title === "string" ? config.title : "";
+    config.date = typeof config.date === "string" ? config.date : "";
     this.config = config;
 
     this.dispatchEvent(
