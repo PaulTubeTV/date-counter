@@ -40,11 +40,11 @@ type: module
 
 3. Home Assistant neu starten (oder Frontend hart neu laden).
 
-## Direkt hinzufügen (My Home Assistant)
+## Direkt in HACS öffnen (My Home Assistant)
 
-Mit diesem Button kannst du die Karte direkt im Lovelace-Dialog vorbefüllen:
+Mit diesem Button kannst du das Repository direkt in HACS öffnen:
 
-[![Open your Home Assistant instance and add this card](https://my.home-assistant.io/badges/lovelace-add-card.svg)](https://my.home-assistant.io/redirect/lovelace/?add-card=%7B%22type%22%3A%22custom%3Adate-counter-card%22%7D)
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=PaulTubeTV&repository=date-counter)
 
 ## Verwendung
 
